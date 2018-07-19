@@ -1,8 +1,13 @@
 <?xml version="1.0"?>
 <CLBConfig output="output/">
         <Geometry nx="128" ny="128">
+                <None name="box">
+                        <Box dx="60" nx="20" dy="20" ny="30"/>
+                </None>
     </Geometry>
     <Model>
+            <Params Value="0"/>
+            <Params Value-box="1"/>
     </Model>
     <VTK Iterations="10"/>
     <Solve Iterations="1000"/>
