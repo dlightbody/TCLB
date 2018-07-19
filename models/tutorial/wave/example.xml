@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<CLBConfig output="output/">
+        <Geometry nx="128" ny="128">
+    </Geometry>
+    <Model>
+    </Model>
+    <VTK Iterations="10"/>
+    <Solve Iterations="1000"/>
+</CLBConfig>
+
+make configure
+./configure --enable-graphics
+make wave
+CLB/wave/main example.xml
