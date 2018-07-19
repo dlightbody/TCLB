@@ -19,4 +19,8 @@ CudaDeviceFunction void Run() {
   v = v(0,0);
 }
 
+CudaDeviceFunction real_t getU() {
+  return u(0,0);
+}
+
 
