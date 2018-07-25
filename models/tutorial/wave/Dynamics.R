@@ -5,3 +5,5 @@ AddQuantity(name="U")
 
 AddSetting(name="Speed")
 AddSetting(name="Value", zonal=TRUE)
+
+AddNodeType(name="Dirichlet", group="BOUNDARY")
