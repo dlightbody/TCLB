@@ -16,6 +16,10 @@ CudaDeviceFunction void Run() {
   real_t a = Speed * Speed * lap_u + Viscosity * lap_v;
   v = v(0,0) + a;
   u = u(0,0) + v;
+  if ((NodeType & NODE_BOUNDARY) == NODE_Dirichlet) {
+    u = Value;
+    v = 0;
+  }
 }
 
 CudaDeviceFunction real_t getU() {
