@@ -8,6 +8,7 @@
     <Model>
             <Params Value="0"/>
             <Params Value-box="1"/>
+            <Params Speed="0.05" />
     </Model>
     <VTK Iterations="10"/>
     <Solve Iterations="1000"/>
