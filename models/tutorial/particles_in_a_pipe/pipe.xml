@@ -1,0 +1,16 @@
+<CLBConfig version="2.0" output="output/3D/">
+        <Geometry nx="64" ny="240" nz="64">
+        <MRT><Box/></MRT>
+                <Wall mask="ALL">
+                       <STL file="pipe.stl" side="out"/>
+                </Wall> 
+        </Geometry>
+        <Model>
+                <Params ForceY="0.0001"/>
+                <Params omega="1.0"/>
+    </Model>
+        <Failcheck Iterations="1000"/>
+        <VTK/>
+        <VTK Iterations="1000" what="U,Solid"/>
+        <Solve Iterations="10000"/>
+</CLBConfig>    
