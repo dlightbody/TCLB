@@ -1,0 +1,43 @@
+<VTKFile type="UnstructuredGrid" version="0.1">
+<UnstructuredGrid>
+<Piece NumberOfPoints="0" NumberOfCells="0">
+<Points>
+<DataArray NumberOfComponents="3" type="Float64" format="ascii">
+</DataArray>
+</Points>
+<PointData Scalars="radius">
+<DataArray type="Float64" Name="radius" NumberOfComponents="1" format="ascii">
+</DataArray>
+<DataArray type="Int32" Name="particleTag" NumberOfComponents="1" format="ascii">
+</DataArray>
+<DataArray type="Float64" Name="particleMass" NumberOfComponents="1" format="ascii">
+</DataArray>
+<DataArray type="Int32" Name="Id" NumberOfComponents="1" format="ascii">
+</DataArray>
+<DataArray type="Float64" Name="velocity" NumberOfComponents="3" format="ascii">
+</DataArray>
+<DataArray type="Float64" Name="angular velocity" NumberOfComponents="3" format="ascii">
+</DataArray>
+<DataArray type="Float64" Name="displacement" NumberOfComponents="3" format="ascii">
+</DataArray>
+<DataArray type="Float64" Name="initial position" NumberOfComponents="3" format="ascii">
+</DataArray>
+<DataArray type="Int32" Name="proc_id" NumberOfComponents="1" format="ascii">
+</DataArray>
+</PointData>
+<Cells>
+<DataArray type="Int32" NumberOfComponents="1" Name="connectivity" format="ascii">
+</DataArray><DataArray type="Int32" NumberOfComponents="1" Name="offsets" format="ascii">
+</DataArray>
+<DataArray type="UInt8" NumberOfComponents="1" Name="types" format="ascii">
+</DataArray>
+</Cells>
+<CellData>
+<DataArray type="Float64" Name="bondStrain" NumberOfComponents="1" format="ascii">
+</DataArray>
+<DataArray type="Int32" Name="bondTag" NumberOfComponents="1" format="ascii">
+</DataArray>
+</CellData>
+</Piece>
+</UnstructuredGrid>
+</VTKFile>
