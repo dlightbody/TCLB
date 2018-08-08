@@ -1,0 +1,76 @@
+<CLBConfig version="2.0" output="output/3D/">
+        <Geometry nx="64" ny="240" nz="64">
+        <MRT><Box/></MRT>
+                <Wall mask="ALL">
+                       <STL file="my/ParticlePipe/pipe.stl" side="out"/>
+                </Wall> 
+        </Geometry>
+        <Model>
+                <Params ForceY="0.0001"/>
+                <Params omega="1.0"/>
+                 <RemoteForceInterface Iterations="10000" particle="RotSphere" verletDist="0.7" gridSpacing="38">
+sim.readMesh(
+    fileName = "my/ParticlePipe/pipe.msh",
+    meshName = "floor_mesh_wall"
+)
+
+geoRandomBlock = RandomBoxPacker(
+    minRadius = 4.0000,
+    maxRadius = 15.0000,
+    cubicPackRadius = 11.0000,
+    maxInsertFails = 1000,
+    bBox = BoundingBox(
+    Vec3(9.0000, 2.0000, 9.0000),
+    Vec3(51.0000, 60.0000, 51.0000)
+    ),
+    circDimList = [False, False, False],
+    tolerance = 1.0000e-05
+    )
+geoRandomBlock.generate()
+geoRandomBlock_particles = geoRandomBlock.getSimpleSphereCollection()
+sim.createParticles(geoRandomBlock_particles)
+sim.setParticleDensity (   tag = 0,   mask = -1,   Density = 2.0)
+
+normalK = 3;
+
+sim.createInteractionGroup (
+    RotFrictionPrms (
+        name = "friction",
+        normalK = normalK,
+        dynamicMu = 0.6,
+        shearK = normalK/10.0,
+        staticMu = 0.6,
+        scaling = True
+        )
+    )
+
+sim.createInteractionGroup (
+    NRotElasticTriMeshPrms (
+        name = "floorWall_repell",
+        meshName = "floor_mesh_wall",
+        normalK = normalK
+        )
+    )
+
+sim.createInteractionGroup (
+    GravityPrms (
+        name = "gravity",
+        acceleration = Vec3(0.0000, 1e-5, 0.0000)
+        )
+    )
+
+sim.createCheckPointer (
+    CheckPointPrms (
+        fileNamePrefix = "flow_data",
+        beginTimeStep = 0,
+        endTimeStep = 20000,
+        timeStepIncr = 100
+        )
+    )
+        </RemoteForceInterface>
+    </Model>
+        <Failcheck Iterations="1000"/>
+        <VTK/>
+        <VTK Iterations="1000" what="U,Solid"/>
+        <Solve Iterations="10000"/>
+</CLBConfig>    
