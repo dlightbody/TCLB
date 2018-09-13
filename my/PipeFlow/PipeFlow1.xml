@@ -1,0 +1,89 @@
+<CLBConfig version="2.0" output="output/3D/PipeFlow/">
+	<Geometry nx="50" ny="200" nz="50">
+        <MRT><Box/></MRT>
+                <Wall mask="ALL">
+                       <STL file="my/PipeFlow/cylinder.stl" side="out"/>
+                </Wall> 
+        </Geometry>
+        <Model>
+                <Params ForceY="0.0001"/>
+                <Params omega="1.0"/>
+                 <RemoteForceInterface Iterations="1000" particle="RotSphere" verletDist="0.1" gridSpacing="3">
+
+# Begin ESyS-Particle
+from math import sqrt
+bondModulus = 0.1
+density = 2.0
+Rmin = 0.5
+Rmax = 1.5
+dt = 0.1*sqrt(4.*density*Rmin**3./3./bondModulus/Rmax)
+sim.setTimeStepSize(dt)
+
+sim.readMesh(
+	fileName = "my/PipeFlow/cylinder.msh",
+	meshName = "cylinder_wall"
+)
+
+geoRandomBlock = RandomBoxPacker(
+	minRadius = 0.5,
+	maxRadius = 1.5,
+	cubicPackRadius = 1.0,
+	maxInsertFails = 1000,
+	bBox = BoundingBox(
+	Vec3(1.25,1.25,1.25),
+	Vec3(3.75,3.75,3.75)
+	),
+	circDimList = [False, False, False],
+	tolerance = 1.0000e-05
+	)
+geoRandomBlock.generate()
+geoRandomBlock_particles = geoRandomBlock.getSimpleSphereCollection()
+sim.createParticles(geoRandomBlock_particles)
+sim.setParticleDensity ( tag = 0, mask = -1, Density = 2.0)
+
+normalK = 0.1; #was 3
+
+sim.createInteractionGroup (
+	RotFrictionPrms (
+		name = "friction",
+		normalK = normalK,
+		dynamicMu = 0.6,
+		shearK = normalK/10.0,
+		staticMu = 0.6,
+		scaling = True
+		)
+	)
+
+sim.createInteractionGroup (
+    NRotElasticTriMeshPrms (
+        name = "cylinderWall_repell",
+        meshName = "cylinder_wall",
+        normalK = normalK
+        )
+    )
+
+sim.createInteractionGroup (
+    GravityPrms (
+        name = "gravity",
+        acceleration = Vec3(0.0000, 1e-5, 0.0000)
+        )
+    )
+
+sim.createCheckPointer (
+    CheckPointPrms (
+        fileNamePrefix = "flow_data",
+        beginTimeStep = 0,
+        endTimeStep = 1000,
+        timeStepIncr = 100
+        )
+    )
+
+# End ESyS-Particle
+
+        </RemoteForceInterface>
+    </Model>
+        <Failcheck Iterations="100"/>
+        <VTK/>
+        <VTK Iterations="100" what="U,Solid"/>
+        <Solve Iterations="1000"/>
+</CLBConfig>    
