@@ -1,0 +1,148 @@
+<CLBConfig version="2.0" output="output/3D/PipeFlow_10/">
+	<Units>
+		<Params M="1m" gauge="1.0" />
+		<Params S="1s" gauge="1302.59" />
+	</Units>
+	<Geometry nx="60" ny="60" nz="200">
+        <MRT><Box/></MRT>
+                <Wall mask="ALL">
+                       <STL file="my/PipeFlow_10/50tmm_cylinder_up.stl" side="out"/>
+                </Wall> 
+        </Geometry>
+        <Model>
+                <Params ForceZ="0.000001"/>
+                <Params omega="0.5000766"/>
+		<Params Density="1050.0"/>
+                 <RemoteForceInterface Iterations="20000" particle="RotSphere" verletDist="0.1" gridSpacing="3.75">
+
+# Begin ESyS-Particle
+from math import sqrt
+
+# Units
+# ================
+# length = tenth of millimeter
+# time = seconds
+# mass = kg
+
+bondModulus =  1000000.0 # Pa 
+bondPoissonRatio = 0.25
+bondCohesion = 15000000.0
+bondTanAngle = 30.0
+frictionCoeff = 0.6
+
+density = 1220 # kg/m**3
+Rmin = 0.5 # m
+Rmax = 1.5 # m
+
+# Set time step parameters
+#dt = 0.1*sqrt(4.*density*Rmin**3./3./bondModulus/Rmax) # seconds
+#dt = 0.001 # seconds
+#sim.setTimeStepSize(dt)
+
+trimeshInteractionType = "glued"
+
+sim.readMesh(
+	fileName = "my/PipeFlow_10/50tmm_cylinder_up.msh",
+	meshName = "cylinder_wall"
+)
+sim.readGeometry("my/PipeFlow_10/Stenosis50_3_lipid_tmm_up.geo")
+sim.setParticleDensity ( tag = 1, mask = -1, Density = density)
+sim.setParticleDensity ( tag = 2, mask = -1, Density = density)
+
+normalK = bondModulus; 
+
+#construct tag for gluing
+meshtag = MeshTagBuildPrms(tag = 2, mask = -1)
+
+#Initialise elastic interactions between DEM particles and the trimesh:
+if (trimeshInteractionType=="elastic"):
+   sim.createInteractionGroup (
+      NRotElasticTriMeshPrms (
+         name = "pmesh_repel",
+         meshName = "cylinder_wall",
+         normalK = bondModulus
+      )
+   )
+elif (trimeshInteractionType == "glued"):
+   sim.createInteractionGroup (
+      NRotBondedTriMeshPrms (
+         name = "pmesh_bond",
+         meshName = "cylinder_wall",
+         normalK = bondModulus,
+         breakDistance = 2.5,
+         buildPrms = meshtag
+      )
+   )
+
+#Specify brittle-elastic beam interactions between bonded particles:
+sim.createInteractionGroup (
+   BrittleBeamPrms (
+      name = "pp_beams",
+      youngsModulus = bondModulus,
+      poissonsRatio = bondPoissonRatio,
+      cohesion = bondCohesion,
+      tanAngle = bondTanAngle,
+      tag = 1
+   )
+)
+
+#Specify rotational frictional interactions between unbonded particles:
+sim.createInteractionGroup (
+   FrictionPrms (
+      name = "pp_friction",
+      youngsModulus = bondModulus,
+      poissonsRatio = bondPoissonRatio,
+      dynamicMu = frictionCoeff,
+      staticMu = frictionCoeff
+   )
+)
+
+#Ensure each particle pair only undergoes beam or frictional interactions:
+sim.createExclusion ("pp_beams","pp_friction")
+
+"""
+sim.createInteractionGroup (
+	RotFrictionPrms (
+		name = "friction",
+		normalK = normalK,
+		dynamicMu = 0.6,
+		shearK = normalK/10.0,
+		staticMu = 0.6,
+		scaling = True
+		)
+	)
+
+sim.createInteractionGroup (
+    NRotElasticTriMeshPrms (
+        name = "cylinderWall_repell",
+        meshName = "cylinder_wall",
+        normalK = normalK
+        )
+    )
+"""
+
+sim.createInteractionGroup (
+    GravityPrms (
+        name = "gravity",
+        acceleration = Vec3(0.0000, 1e-5, 0.0000)
+        )
+    )
+
+sim.createCheckPointer (
+    CheckPointPrms (
+        fileNamePrefix = "PipeFlow_10_data",
+        beginTimeStep = 0,
+        endTimeStep = 20000,
+        timeStepIncr = 100
+        )
+    )
+
+# End ESyS-Particle
+
+        </RemoteForceInterface>
+    </Model>
+        <Failcheck Iterations="1000"/>
+        <VTK/>
+        <VTK Iterations="100" what="U,P,Solid"/>
+        <Solve Iterations="20000"/>
+</CLBConfig>    
